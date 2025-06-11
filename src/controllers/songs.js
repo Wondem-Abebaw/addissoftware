@@ -41,7 +41,16 @@ exports.deleteSong = async (req, res, next) => {
   try {
     const song = await songService.deleteSong(req.params.id);
     if (!song) return next(new AppError("Song not found", 404));
-    sendResponse(res, 204, null);
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
+// controller/song.js (add this)
+exports.searchSongs = async (req, res, next) => {
+  try {
+    const songs = await songService.searchSongs(req.query.q); // Assuming 'q' as query parameter
+    sendResponse(res, 200, songs);
   } catch (error) {
     next(error);
   }

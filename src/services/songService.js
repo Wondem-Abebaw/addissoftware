@@ -1,30 +1,17 @@
 const Song = require("../models/Song");
-const cache = require("../utils/cache");
+const ApiFeatures = require("../utils/apiFeature");
 
 const createSong = async (songData) => {
   const song = await Song.create(songData);
-  cache.del("songs:*");
   return song;
 };
 
 const getSongById = async (id) => {
-  const cacheKey = `song:${id}`;
-  const cachedSong = await cache.get(cacheKey);
-
-  if (cachedSong) return cachedSong;
-
   const song = await Song.findById(id);
-  if (song) await cache.set(cacheKey, song);
   return song;
 };
 
 const getAllSongs = async (queryParams) => {
-  const cacheKey = `songs:${JSON.stringify(queryParams)}`;
-  const cachedData = await cache.get(cacheKey);
-
-  if (cachedData) return cachedData;
-
-  // Advanced filtering, sorting, pagination
   const features = new ApiFeatures(Song.find(), queryParams)
     .filter()
     .sort()
@@ -32,7 +19,6 @@ const getAllSongs = async (queryParams) => {
     .paginate();
 
   const songs = await features.query;
-  await cache.set(cacheKey, songs);
   return songs;
 };
 
@@ -42,21 +28,32 @@ const updateSong = async (id, updateData) => {
     runValidators: true,
   });
 
-  if (song) {
-    cache.del(`song:${id}`);
-    cache.del("songs:*");
-  }
-
   return song;
 };
 
 const deleteSong = async (id) => {
   const song = await Song.findByIdAndDelete(id);
-  if (song) {
-    cache.del(`song:${id}`);
-    cache.del("songs:*");
-  }
   return song;
+};
+
+const createBulkSongs = async (songs) => {
+  const createdSongs = await Song.insertMany(songs);
+  return createdSongs;
+};
+
+const deleteBulkSongs = async () => {
+  const result = await Song.deleteMany({});
+  return result;
+};
+
+const searchSongs = async (query) => {
+  const songs = await Song.find({
+    $or: [
+      { title: { $regex: query, $options: "i" } },
+      { artist: { $regex: query, $options: "i" } },
+    ],
+  });
+  return songs;
 };
 
 module.exports = {
@@ -65,4 +62,7 @@ module.exports = {
   getAllSongs,
   updateSong,
   deleteSong,
+  createBulkSongs,
+  deleteBulkSongs,
+  searchSongs,
 };

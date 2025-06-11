@@ -8,6 +8,9 @@ const client = redis.createClient({
 });
 
 client.on("error", (err) => logger.error("Redis Client Error", err));
+(async () => {
+  await client.connect(); //
+})();
 
 const getAsync = promisify(client.get).bind(client);
 const setAsync = promisify(client.set).bind(client);
@@ -17,7 +20,7 @@ const keysAsync = promisify(client.keys).bind(client);
 // Pattern-based deletion for cache invalidation
 const delPattern = async (pattern) => {
   const keys = await keysAsync(pattern);
-  if (keys.length) await delAsync(keys);
+  if (keys.length) await delAsync(...keys);
 };
 
 module.exports = {

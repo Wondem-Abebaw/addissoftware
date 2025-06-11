@@ -5,14 +5,12 @@ const connectDB = async () => {
   try {
     console.log("Connecting to MongoDB..."); // TEMP debug
     const conn = await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 5000,
       maxPoolSize: 10,
       minPoolSize: 2,
       socketTimeoutMS: 45000,
     });
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
 
     // logger.info(`MongoDB Connected: ${conn.connection.host}`);
 
@@ -40,7 +38,7 @@ const connectDB = async () => {
       process.exit(0);
     });
   } catch (error) {
-    console.error("❌ MongoDB connection failed:", error);
+    console.error(" MongoDB connection failed:", error);
     // logger.error(`Database connection failed: ${error.message}`);
     process.exit(1);
   }
