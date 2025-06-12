@@ -17,15 +17,17 @@ router.get("/search", songController.searchSongs);
 //   .route("/bulk")
 //   .post(songController.createBulkSongs)
 //   .delete(songController.deleteBulkSongs);
-router.route("/", songController.getSongs);
+router.get("/get-songs", songController.getSongs);
 
-router.route("/:id", songController.getSong);
+// router.get("/get-song/:id", songController.getSong);
 
-router.route("/").post(songController.createSong);
+router.post("/create-song", songController.createSong);
+router.delete("/delete-song/:id", songController.deleteSong);
+router.put("/update-song/:id", songController.updateSong);
 
-router
-  .route("/:id")
-  .put(songController.updateSong)
-  .delete(songController.deleteSong);
+// router
+//   .route("/:id")
+//   .put(songController.updateSong)
+//   .delete(songController.deleteSong);
 
 module.exports = router;
